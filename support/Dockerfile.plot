@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: BSD-3-Clause
 # Authors: Alexander Jung <a.jung@lancs.ac.uk>
-FROM debian:buster
+FROM debian:bookworm
 
 ENV DEBIAN_FRONTEND noninteractive
 
@@ -11,6 +11,7 @@ RUN set -xe; \
     apt-get install -y \
       git \
       python3 \
+      python3-venv \
       python3-pip \
       python3-click \
       python3-tabulate \
@@ -21,5 +22,9 @@ RUN set -xe; \
       texlive-full \
 		  texlive-fonts-recommended \
       texlive-fonts-extra \
-		  dvipng; \
-    pip3 install -r /requirements.txt
+		  dvipng;
+RUN python3 -m venv /venv
+ENV PATH="/venv/bin:$PATH"
+RUN pip install -r /requirements.txt
+
+    

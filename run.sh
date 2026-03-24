@@ -83,12 +83,12 @@ function install_dependencies() {
   local DISTRO=$(lsb_release -c -s)
 
   case $DISTRO in
-    buster)
+    bookworm)
       apt-get update
       apt-get install -y \
         git \
         clang \
-        bsdcpio \
+        libarchive-tools \
         doxygen \
         libhugetlbfs-bin \
         build-essential \

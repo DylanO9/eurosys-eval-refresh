@@ -1,16 +1,18 @@
-FROM debian:buster
+FROM debian:bookworm
 
 ARG UK_KRAFT_GITHUB_TOKEN=
 ENV UK_KRAFT_GITHUB_TOKEN=$UK_KRAFT_GITHUB_TOKEN
 ARG KRAFT_VERSION=913a31bb45cc4be6b69133473842ad3622065342
+#ARG KRAFT_VERSION=origin/stable
 ENV DEBIAN_FRONTEND=noninteractive
 
-RUN set -xe; \
-    apt-get update; \
+RUN set -xe && \
+    apt-get update && \
     apt-get install -y --no-install-recommends \
       python3-pip \
       python3-wheel \
       python3-setuptools \
+      python3-venv \
       python3-dev \
       make \
       libncursesw5-dev \
@@ -29,13 +31,23 @@ RUN set -xe; \
       build-essential \
       ca-certificates \
       locales \
-      xz-utils; \
-    echo "en_US.UTF-8 UTF-8" > /etc/locale.gen; \
-    locale-gen; \
-    pip3 install git+https://github.com/unikraft/kraft.git@$KRAFT_VERSION
+      xz-utils && \
+    echo "en_US.UTF-8 UTF-8" > /etc/locale.gen && \
+    locale-gen
+RUN python3 -m venv /opt/venv && \
+    /opt/venv/bin/pip install -U pip setuptools wheel && \
+    /opt/venv/bin/pip install "setuptools<58" && \
+    #/opt/venv/bin/pip install "feedparser>=6.0.10" && \
+    /opt/venv/bin/pip install --no-build-isolation "git+https://github.com/unikraft/kraft.git@${KRAFT_VERSION}" && \
+    ln -s /opt/venv/bin/kraft /usr/local/bin/kraft
+RUN sed -i \
+"s/getattr(base64, 'decodebytes', base64.decodestring)/base64.decodebytes/" \
+/opt/venv/lib/python3.11/site-packages/feedparser.py
+
+ENV PATH="opt/venv/bin:${PATH}"
 
 env UK_WORKDIR=/usr/src/unikraft
 env LC_ALL=C.UTF-8
 env LANG=C.UTF-8
 
-RUN kraft list update
+# RUN kraft list --update
