@@ -314,3 +314,7 @@ def plot(data=None, output=None):
   # Save to file
   fig.tight_layout()
   fig.savefig(output)
+
+if __name__ == '__main__':
+  import fire
+  fire.Fire(plot)
