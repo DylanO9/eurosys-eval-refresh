@@ -2,7 +2,7 @@
 # Files and directories
 #
 WORKDIR ?= $(CURDIR)
-RESULTS ?= $(WORKDIR)/results
+RESULTS ?= $(if $(wildcard $(WORKDIR)/results/*),$(WORKDIR)/results,$(WORKDIR)/paperresults)
 PLOT ?= $(WORKDIR)/$(notdir $(WORKDIR)).svg
 
 #

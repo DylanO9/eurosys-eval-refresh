@@ -2,7 +2,7 @@
 # Files and directories
 #
 WORKDIR ?= $(CURDIR)
-RESULTS ?= $(WORKDIR)/results
+RESULTS ?= $(if $(wildcard $(WORKDIR)/results/*),$(WORKDIR)/results,$(WORKDIR)/paperresults)
 PLOT ?= $(WORKDIR)/$(notdir $(WORKDIR)).svg
 
 #
@@ -27,7 +27,7 @@ run:
 
 .PHONY: plot
 plot:
-	$(WORKDIR)/plot.sh
+	-$(WORKDIR)/plot.sh
 	$(SNAKE) $(WORKDIR)/plot.py --data $(RESULTS) --output $(PLOT)
 
 .PHONY: clean

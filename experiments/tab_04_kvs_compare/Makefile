@@ -2,7 +2,7 @@
 # Files and directories
 #
 WORKDIR ?= $(CURDIR)
-RESULTS ?= $(WORKDIR)/results/merged.csv
+RESULTS ?= $(if $(wildcard $(WORKDIR)/results/merged.csv),$(WORKDIR)/results/merged.csv,$(WORKDIR)/paperresults/merged.csv)
 PLOT_FORMAT ?= svg
 PLOT ?= $(WORKDIR)/$(notdir $(WORKDIR)).svg
 

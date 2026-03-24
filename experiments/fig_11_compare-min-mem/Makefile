@@ -21,7 +21,7 @@ all: prepare run plot
 
 .PHONY: prepare
 prepare:
-	# $(ROOTDIR)/tools/build-lupine.sh -d $(LUPINEDIR)
+	#$(ROOTDIR)/tools/build-lupine.sh -d $(LUPINEDIR)
 	$(DOCKER) pull hlefeuvre/alpine-sqlite
 	$(DOCKER) tag hlefeuvre/alpine-sqlite alpine-sqlite
 	$(WORKDIR)/genimages.sh

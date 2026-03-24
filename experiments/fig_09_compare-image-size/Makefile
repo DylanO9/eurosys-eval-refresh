@@ -4,7 +4,7 @@
 WORKDIR ?= $(CURDIR)
 IMPLDIR ?= $(WORKDIR)/impl
 IMAGESDIR ?= $(WORKDIR)/images
-RESULTSDIR ?= $(WORKDIR)/results
+RESULTSDIR ?= $(if $(wildcard $(WORKDIR)/results/*),$(WORKDIR)/results,$(WORKDIR)/paperresults)
 PLOT ?= $(WORKDIR)/$(notdir $(WORKDIR)).svg
 
 #
