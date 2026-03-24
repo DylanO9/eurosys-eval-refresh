@@ -1,27 +1,18 @@
-linux
-		avg	med	q1	q3
-tsc		70.62	70.0	68.0	72.0
-tsc_nsec	19.62	19.44	18.89	20.0
-fcall		4.06	4.0	4.0	4.0
-fcall_nsec	1.13	1.11	1.11	1.11
-scall		222.0	222.0	222.0	222.0
-scall_nsec	61.67	61.67	61.67	61.67
-
-linux-nomitig
-		avg	med	q1	q3
-tsc		70.94	70.0	68.0	74.0
-tsc_nsec	19.7	19.44	18.89	20.56
-fcall		4.06	4.0	4.0	4.0
-fcall_nsec	1.13	1.11	1.11	1.11
-scall		153.75	154.0	153.0	154.0
-scall_nsec	42.71	42.78	42.5	42.78
-
-unikraft
-		avg	med	q1	q3
-tsc		69.52	68.0	68.0	70.0
-tsc_nsec	19.31	18.89	18.89	19.44
-fcall		4.06	4.0	4.0	4.0
-fcall_nsec	1.13	1.11	1.11	1.11
-scall		84.0	84.0	84.0	84.0
-scall_nsec	23.33	23.33	23.33	23.33
-
+linux,tsc,70.62,70.0,68.0,72.0
+linux,tsc_nsec,19.62,19.44,18.89,20.0
+linux,fcall,4.06,4.0,4.0,4.0
+linux,fcall_nsec,1.13,1.11,1.11,1.11
+linux,scall,222.0,222.0,222.0,222.0
+linux,scall_nsec,61.67,61.67,61.67,61.67
+linux-nomitig,tsc,70.94,70.0,68.0,74.0
+linux-nomitig,tsc_nsec,19.7,19.44,18.89,20.56
+linux-nomitig,fcall,4.06,4.0,4.0,4.0
+linux-nomitig,fcall_nsec,1.13,1.11,1.11,1.11
+linux-nomitig,scall,153.75,154.0,153.0,154.0
+linux-nomitig,scall_nsec,42.71,42.78,42.5,42.78
+unikraft,tsc,69.52,68.0,68.0,70.0
+unikraft,tsc_nsec,19.31,18.89,18.89,19.44
+unikraft,fcall,4.06,4.0,4.0,4.0
+unikraft,fcall_nsec,1.13,1.11,1.11,1.11
+unikraft,scall,84.0,84.0,84.0,84.0
+unikraft,scall_nsec,23.33,23.33,23.33,23.33
