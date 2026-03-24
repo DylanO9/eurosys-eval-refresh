@@ -515,6 +515,8 @@ def main():
                         help='Plot syscall support')
     parser.add_argument('-m', '--missing', action='store_true',
                         help='Percentage of syscalls missing per app')
+    parser.add_argument('--dir', default=APPLICATION_JSON_FOLDER,
+                        help='Folder with application JSON files (default: ' + APPLICATION_JSON_FOLDER + ')')
     args = parser.parse_args()
 
     data_sheet = process_syscall_spreadsheet(SHEET_FILENAME)
@@ -531,7 +533,7 @@ def main():
             "num_apps": 0
             }
     # Read folder with application JSON files and aggregate the data.
-    walk_application_json_folder(APPLICATION_JSON_FOLDER)
+    walk_application_json_folder(args.dir)
 
     # Collect statistics about supported system calls for each app.
     collect_app_syscalls_supported()
