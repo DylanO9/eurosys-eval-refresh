@@ -44,7 +44,8 @@ def plot(data=None, output=None):
     **dict.fromkeys(["ukboot"], "ukboot1"),
     **dict.fromkeys(["ukargparse"], "ukargparse1"),
     }
-    # indirect calls
+    # indirect calls (initialize if not found by cscope in current source)
+    adj_list["ukallocbbuddy"].setdefault("ukalloc", 0)
     adj_list["ukallocbbuddy"]["ukalloc"] += 2
     G = {}
     for i in components:
