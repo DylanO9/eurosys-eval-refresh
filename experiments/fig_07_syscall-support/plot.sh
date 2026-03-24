@@ -1,7 +1,10 @@
 #!/bin/bash
 DIR="results"
-if [ -d "$DIR" ]; then
+# Fall back to paperresults if results/ is empty or missing
+if [ -d "$DIR" ] && [ -n "$(ls -A $DIR 2>/dev/null)" ]; then
     python3 cruncher.py --plot
+elif [ -d "paperresults" ]; then
+    python3 cruncher.py --plot --dir paperresults
 else
     echo "$DIR does not exist. Perform the unikraft syscall experiment first"
 fi

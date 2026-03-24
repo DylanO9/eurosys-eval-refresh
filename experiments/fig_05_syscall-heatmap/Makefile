@@ -3,6 +3,7 @@
 #
 WORKDIR ?= $(CURDIR)
 PLOT ?= $(WORKDIR)/$(notdir $(WORKDIR)).svg
+CP ?= cp
 
 all:
 	$(WORKDIR)/setup.sh
