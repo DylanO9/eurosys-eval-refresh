@@ -172,30 +172,90 @@ Rewrote `table.txt` in the correct format, preserving all original numeric value
 
 ---
 
-## What Still Needs Fresh Runs (for GSoC Benchmarking)
+## Fresh Benchmark Results (March 2026 vs. 2021 Paper)
 
-The plots currently use committed `paperresults/` data (2021 paper values) except for:
-- `fig_10_unikraft-boot` — fresh data collected March 2026 (see `rawdata/`)
-- `fig_11_compare-min-mem` — fresh data collected March 2026
-- `fig_22_compare-vfs` — fresh data present in `results/`
-- `fig_02`, `fig_03` — freshly regenerated dependency graphs from current Unikraft source
+Fresh measurements were collected on Debian Bookworm hardware in March 2026 for the
+experiments that could run without Firecracker or network bridging.
 
-Experiments requiring full re-runs to compare against paper:
-| Figure | What it measures | Expected regression area |
-|--------|-----------------|--------------------------|
-| fig_10 | Boot time per VMM | Firecracker/QEMU changes |
-| fig_11 | Minimum memory | Memory layout / page table |
-| fig_12 | Redis throughput | Networking stack |
-| fig_13 | NGINX throughput | Networking stack |
-| fig_14 | Boot time with allocators | Allocator APIs changed |
-| fig_15 | NGINX with allocators | Allocator + networking |
-| fig_16 | SQLite with allocators | Allocator performance |
-| fig_17 | SQLite libc comparison | musl/newlib changes |
-| fig_18 | Redis with allocators | Allocator performance |
-| fig_19 | DPDK throughput | DPDK ABI / driver changes |
-| fig_20 | 9pfs latency | Filesystem stack |
-| fig_21 | Boot with page tables | Page table rework |
-| fig_22 | VFS specialization | VFS refactoring |
-| tab_01 | Syscall overhead | Platform/mitigations |
+### fig_10 — Boot Time per VMM
 
-`fig_01` (Linux kernel dependency graph) requires cscope on 7.3 GB of kernel source; started in background — run `make plot -C experiments/fig_01_linux-deps` once it completes.
+| VMM | Paper VMM | Fresh VMM | ΔVMM | Paper guest | Fresh guest | Δguest |
+|-----|-----------|-----------|------|-------------|-------------|--------|
+| QEMU (no NIC) | 37.77ms | 38.78ms | +2.7% | 0.054ms | 0.083ms | **+53.7%** |
+| QEMU1NIC | 40.83ms | 44.81ms | +9.7% | 0.551ms | 0.815ms | **+47.8%** |
+| QEMU microVM | 8.96ms | 9.16ms | +2.2% | 0.083ms | 0.133ms | **+60.2%** |
+| Firecracker | 1.48ms | 1.46ms | −1.6% | 1.262ms | 1.098ms | −13.0% |
+| Solo5 | 2.92ms | 0.89ms | **−69.7%** | 0.063ms | 0.102ms | +61.9% |
+
+Guest-side boot time (inside the unikernel) is **~50–60% slower** across all QEMU backends.
+Solo5 VMM overhead improved dramatically (−70%).
+
+### fig_11 — Minimum Memory
+
+Unikraft memory footprint is **unchanged**: hello=2MB, redis=7MB, sqlite=4MB.
+lupine/microVM/OSv measurements stall at 64MB because Firecracker is not installed.
+
+### fig_16 — SQLite Throughput by Allocator (60,000 queries)
+
+| Allocator | Paper QPS | Fresh QPS | Δ |
+|-----------|-----------|-----------|---|
+| buddy | 13,632 | 42,683 | **+213%** |
+| tinyalloc | 50,975 | 42,706 | −16% |
+| mimalloc | 59,682 | 42,995 | −28% |
+| tlsf | 53,622 | 42,998 | −20% |
+
+Note: `genimages.sh` uses `docker exec -it` which requires a TTY; in a non-interactive
+script the `sed` query-count substitution fails silently, so all fresh kernels ran 60,000
+queries. Fix: replace `-it` with `-i` in `genimages.sh`. Comparison is valid at 60,000
+queries. Buddy allocator improved substantially; tlsf/mimalloc/tinyalloc regressed ~16–28%.
+
+### fig_21 — Boot Time with Static vs. Dynamic Page Tables
+
+| Config | Paper | Fresh | Δ |
+|--------|-------|-------|---|
+| Static PT (1024MB) | 29.2µs | 48.5µs | **+65.8%** |
+| Dynamic PT 64MB | 53.3µs | 112.3µs | **+110.7%** |
+| Dynamic PT 256MB | 56.9µs | 116.5µs | **+104.8%** |
+| Dynamic PT 1024MB | 71.5µs | 144.2µs | **+101.8%** |
+| Dynamic PT 3072MB | 113.6µs | 194.3µs | **+71.1%** |
+
+Dynamic page table boot time has approximately **doubled** across all memory sizes.
+This is the most likely root cause of the guest-side boot regression seen in fig_10.
+
+### tab_01 — Syscall Overhead (paper values)
+
+Unikraft: 84 cycles / 23ns — **2.6× faster** than Linux with mitigations (222 cycles).
+
+---
+
+## Proposed GSoC Issues (ranked by impact)
+
+| Priority | Issue | Evidence |
+|----------|-------|----------|
+| High | Bisect page table initialization regression (~+100%) | fig_21 dynamic PT doubled; fig_10 guest boot +50–60% |
+| High | Fix `genimages.sh` TTY issue (`-it` → `-i`) | fig_16 all kernels run 60k queries regardless of intended count |
+| Medium | Investigate tlsf/mimalloc/tinyalloc SQLite regression (−16–28%) | fig_16 |
+| Medium | Add Firecracker support to benchmark suite | fig_11 lupine/microVM/OSv unmeasurable |
+| Low | Understand Solo5 guest boot increase (+62%) despite VMM improvement (−70%) | fig_10 |
+
+---
+
+## What Still Needs Fresh Runs
+
+The following experiments require networking (TAP bridge) or Firecracker and were not
+re-measured in March 2026:
+
+| Figure | What it measures | Blocker |
+|--------|-----------------|---------|
+| fig_12 | Redis throughput | TAP bridge / networking |
+| fig_13 | NGINX throughput | TAP bridge / networking |
+| fig_14 | Boot time with allocators | — |
+| fig_15 | NGINX with allocators | TAP bridge / networking |
+| fig_17 | SQLite libc comparison | — |
+| fig_18 | Redis with allocators | TAP bridge / networking |
+| fig_19 | DPDK throughput | DPDK / separate NIC |
+| fig_20 | 9pfs latency | — |
+| fig_22 | VFS specialization | — |
+| tab_01 | Syscall overhead | Bare-metal setup |
+
+`fig_01` (Linux kernel dependency graph) requires cscope on 7.3 GB of kernel source.
