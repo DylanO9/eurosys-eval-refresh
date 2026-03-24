@@ -2,7 +2,8 @@
 # Files and directories
 #
 WORKDIR ?= $(CURDIR)
-RESULTS ?= $(WORKDIR)/results
+MEM ?= 1024M
+RESULTS ?= $(if $(wildcard $(WORKDIR)/results/$(MEM)/*),$(WORKDIR)/results/$(MEM),$(WORKDIR)/paperresults/$(MEM))
 PLOT ?= $(WORKDIR)/$(notdir $(WORKDIR)).svg
 
 #
